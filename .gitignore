@@ -1,3 +1,13 @@
+# Dependencies
+*.dep
+
+# Include 
+lnInclude/
+linux64Gcc*/
+
+# swap files
+*.swp
+
 # Prerequisites
 *.d
 
