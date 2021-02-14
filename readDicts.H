@@ -1,47 +1,47 @@
-  Info << "Reading dissolFoam flags" << nl;
-  
-  Info << "Reading transportProperties" << nl;
+Info << "Reading dissolFoam flags" << nl;
 
-  IOdictionary transportProperties
-  (
-      IOobject
-      (
-          "transportProperties",
-          runTime.constant(),
-          mesh,
-          IOobject::MUST_READ,
-          IOobject::NO_WRITE
-      )
-  );
+Info << "Reading transportProperties" << nl;
 
-  const dimensionSet dimInvL2(0, -2, 0, 0, 0, 0, 0);
-  const dimensionSet dimDiffusion(0, 2, -1, 0, 0, 0, 0);
-/*
-  dimensionedScalar nu
-  (
-      "nu",
-      dimDiffusion,
-      transportProperties
-  );
-*/
-  dimensionedScalar D
-  (
-      "D",
-      dimDiffusion,
-      transportProperties
-  );
+IOdictionary transportProperties
+(
+    IOobject
+    (
+        "transportProperties",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    )
+);
 
-  dimensionedScalar lR
-  (
-      "lR",
-      dimLength,
-      transportProperties
-  );
+const dimensionSet dimInvL2(0, -2, 0, 0, 0, 0, 0);
+const dimensionSet dimDiffusion(0, 2, -1, 0, 0, 0, 0);
+
+dimensionedScalar nu
+(
+    "nu",
+    dimDiffusion,
+    transportProperties
+);
+
+dimensionedScalar D
+(
+    "D",
+    dimDiffusion,
+    transportProperties
+);
+
+dimensionedScalar lR
+(
+    "lR",
+    dimLength,
+    transportProperties
+);
 
 
-  Info << "***************************************************" << nl;
-//  Info << "transportProperties, nu:    " << nu                  << nl;
-  Info << "transportProperties, D:     " << D                   << nl;
-  Info << "transportProperties, lR:    " << lR                  << nl;
-  Info << "***************************************************" << endl;
+Info << "***************************************************" << nl;
+Info << "transportProperties, nu:    " << nu                  << nl;
+Info << "transportProperties, D:     " << D                   << nl;
+Info << "transportProperties, lR:    " << lR                  << nl;
+Info << "***************************************************" << endl;
 

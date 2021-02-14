@@ -40,7 +40,8 @@ Description
 //#include "pointPatchField.H"
 //#include "syncTools.H"
 #include "dynamicFvMesh.H"
- #include "pimpleControl.H"
+#include "pimpleControl.H"
+#include "CorrectPhi.H"
 
 // dissolFoam project
 //#include "steadyStateControl.H"
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
+    #include "initContinuityErrs.H"
     #include "createPimpleControl.H"
 
     // TODO make it general with input from a dictionary
@@ -62,6 +64,8 @@ int main(int argc, char *argv[])
     // local includes
     #include "readDicts.H"
     #include "createFields.H"
+    #include "createUfIfPresent.H"
+    #include "CourantNo.H"
 
 // * * * * *   MAIN LOOP   * * * * * * * * * * * * * * * * * * * * * //
 
@@ -86,37 +90,39 @@ int main(int argc, char *argv[])
 
     scalar dt = runTime.deltaTValue();
 
-    scalar preFactor = 0.01 * Foam::sqrt( 2.0 * D.value() );
-
     while ( runTime.run() )
     {
+        //#include "readDyMControls.H"
+        //#include "CourantNo.H"
+
         ++runTime;
         Info << "Begin cycle: Time = " << runTime.timeName() 
              << "    dt = " << dt
              << nl << endl;
 
-        // --- Pressure-velocity PIMPLE corrector loop
-        while (pimple.loop())                                                
-        {                                                                    
-    
+
 /*###############################################
  *    Mesh motion & relaxation
  *    Control parameters in dynamicMeshDict
  *###############################################*/
-    
-            //mesh.update();
-            mesh.controlledUpdate();
+        mesh.update();
+        //mesh.controlledUpdate();
+/*
+        Info << "Mesh update: ExecutionTime = " 
+             << runTime.elapsedCpuTime() << " s"
+             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+             << nl<< endl;
+*/
+        // Info << " Update curvature"<<nl; 
+        curv = fam.faceCurvatures();
 
-            Info << "Mesh update: ExecutionTime = " 
-                 << runTime.elapsedCpuTime() << " s"
-                 << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-                 << nl<< endl;
-            // Info << " Update curvature"<<nl; 
-            curv = fam.faceCurvatures(); 
+        // --- Pressure-velocity PIMPLE corrector loop
+        while (pimple.loop())                                                
+        {                                                                    
 
             if (mesh.changing())
             {
-                if (correctPhi)
+                //if (correctPhi)
                 {
                     // Calculate absolute flux
                     // from the mapped surface velocity
@@ -128,9 +134,9 @@ int main(int argc, char *argv[])
                     fvc::makeRelative(phi, U);
                 }
 
-                if (checkMeshCourantNo)
+                //if (checkMeshCourantNo)
                 {
-                    #include "meshCourantNo.H"
+                //    #include "meshCourantNo.H"
                 }
             }
 

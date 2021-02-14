@@ -2,7 +2,7 @@
 
 tmp<fvVectorMatrix> tUEqn
 (
-    fvm::ddt(rho, U)
+    fvm::ddt(U)
     +
     fvm::div(phi, U)
     -
