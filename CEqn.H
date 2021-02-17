@@ -1,6 +1,6 @@
 
 {
-    scalar preFactor = 0.001 * Foam::sqrt( 2.0 * D.value() );
+    scalar preFactor = 0.002 * Foam::sqrt( 2.0 * D.value() );
 
     scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
     forAll(RND, i)
@@ -14,11 +14,15 @@
         scalar fV = Foam::sqrt(mesh.V()[i]);
         //Info<<fV<<nl;
         RND[i] = rand.GaussNormal<vector>() / fV;
+        //RND[i] = preFactor * Foam::sqrt(Foam::mag(C[i]*(1-C[i]))) * sqrtDTinv * rand.GaussNormal<vector>() / fV;
+        //RND[i] = preFactor * sqrtDTinv * rand.GaussNormal<vector>() / fV;
     }
     //Info<<"min(RND): "<<min(RND)<<"  max(RND): "<<max(RND)<<nl;
 
     tmp<volScalarField> cc = Foam::mag(C * (1-C));
     RND = preFactor * Foam::sqrt( cc ) * sqrtDTinv * RND;
+
+    /*
     vector maxR=vector::zero, minR=vector::one;
     forAll(RND, i)
     {
@@ -28,9 +32,11 @@
             maxR = max( maxR, RND[i] );
         }
     }
+    */
 
-    Info<<"min(RND): "<<minR<<"  max(RND): "<<maxR<<nl;
+    RND.correctBoundaryConditions();
 
+    //Info<<"min(RND): "<<minR<<"  max(RND): "<<maxR<<"   pre:"<<preFactor*sqrtDTinv<<nl;
     tmp<fvScalarMatrix> tCEqn
     (
         fvm::ddt(C) 
@@ -48,8 +54,8 @@
 
     double residual = solve( CEqn ).initialResidual();
 
-    C.min(1.0);
-    C.max(0.0);
+    //C.min(1.0);
+    //C.max(0.0);
 
     Info << "CEqn residual: "<< residual << endl;
 }

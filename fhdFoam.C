@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
     #include "initContinuityErrs.H"
-    #include "createPimpleControl.H"
+    //#include "createPimpleControl.H"
+    pimpleControl pimple(mesh, "PIMPLE", false);
 
     // TODO make it general with input from a dictionary
     // create fa mesh using patch
@@ -89,6 +90,8 @@ int main(int argc, char *argv[])
                           << nl;
 
     scalar dt = runTime.deltaTValue();
+
+    C.correctBoundaryConditions();
 
     while ( runTime.run() )
     {
@@ -157,7 +160,7 @@ int main(int argc, char *argv[])
 // *********************************************************
 
         runTime.write();
-        runTime.printExecutionTime(Info);
+        //runTime.printExecutionTime(Info);
     }
 
     Info << "End" << endl;
