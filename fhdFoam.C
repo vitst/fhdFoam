@@ -27,7 +27,7 @@ Application
 Description
     Solves diffusion equation for multispecies
  
-    Works with official and extended versions of OpenFOAM
+    Works with official and extended OpenFOAM
     Currently: OpenFOAM v2012
 
 \*---------------------------------------------------------------------------*/
@@ -43,6 +43,8 @@ Description
 #include "pimpleControl.H"
 #include "CorrectPhi.H"
 
+#include "steadyStateControl.H"
+
 // dissolFoam project
 //#include "steadyStateControl.H"
 //#include "dissolMotionPointPatchVectorField.H"
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
-    #include "initContinuityErrs.H"
+    //#include "initContinuityErrs.H"
     //#include "createPimpleControl.H"
     pimpleControl pimple(mesh, "PIMPLE", false);
 
@@ -72,13 +74,35 @@ int main(int argc, char *argv[])
 
     runTime.functionObjects().execute();     // Execute cntlDict functions
 
+// * * * * *   INITIATING THE FLOW   * * * * * * * * * * * * * * * * * * * * * //
+    Random rand(512462521+1007*Pstream::myProcNo());
+
+    /*
+    scalar rn = rand.GaussNormal<scalar>();
+    Pout<<"random: "<< rn <<"    "<<Pstream::myProcNo()<<nl;
+    scalar rng = rand.globalGaussNormal<scalar>();
+    Pout<<" global random: "<< rng <<nl;
+    exit(0);
+    */
+
+
+    if(runTime.value()==0)
+    { 
+        #include "equilibrate.H"
+    }
+    C.correctBoundaryConditions();
+    runTime.writeNow();
+
+    //bool resCM = mesh.checkMesh(true);
+    int resCMt = mesh.checkTopology(true);
+    int resCMg = mesh.checkGeometry(true);
+    Info<<"result of check mesh I run:  "<<resCMt<<"  "<<resCMg<<nl;
+
 /*##########################################
  *   Time-dependent convection-diffusion solver
  *##########################################*/
 
     Info << "Time-dependent concentration solver"<< endl;
-
-    Random rand(512462521);
 
     scalar totVol = 0;
     for(scalar cellVol: mesh.V()) totVol+=cellVol;
@@ -91,7 +115,6 @@ int main(int argc, char *argv[])
 
     scalar dt = runTime.deltaTValue();
 
-    C.correctBoundaryConditions();
 
     while ( runTime.run() )
     {
@@ -118,11 +141,16 @@ int main(int argc, char *argv[])
 */
         // Info << " Update curvature"<<nl; 
         curv = fam.faceCurvatures();
+        Info<<"min(curv): "<<min(curv)<<"  max(curv): "<<max(curv)<<nl;
+
+        //resCMt = mesh.checkTopology(true);
+        resCMg = mesh.checkGeometry(false);
+        Info<<"Check mesh (geometry):  "<<resCMg<<nl;
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())                                                
         {                                                                    
-
+/*
             if (mesh.changing())
             {
                 //if (correctPhi)
@@ -142,7 +170,7 @@ int main(int argc, char *argv[])
                 //    #include "meshCourantNo.H"
                 }
             }
-
+*/
 
             #include "UEqn.H"
             #include "CEqn.H"
@@ -151,7 +179,7 @@ int main(int argc, char *argv[])
             while (pimple.correct())
             {
                 // assuming pimple consistent is true
-                #include "pcEqn.H"
+                #include "pEqn.H"
             }
         }                                                                    
 
@@ -160,6 +188,8 @@ int main(int argc, char *argv[])
 // *********************************************************
 
         runTime.write();
+        //mesh.update();
+        //mesh.controlledUpdate();
         //runTime.printExecutionTime(Info);
     }
 

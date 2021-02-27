@@ -92,3 +92,19 @@ areaScalarField curv
 );
 curv = fam.faceCurvatures(); 
 
+// create time field to test local euler
+volScalarField rDeltaT
+(
+    IOobject
+    (
+        "rDeltaT",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("one", dimless/dimTime, runTime.deltaTValue()),
+    extrapolatedCalculatedFvPatchScalarField::typeName
+);
+
