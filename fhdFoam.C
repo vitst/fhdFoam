@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     //#include "createPimpleControl.H"
     pimpleControl pimple(mesh, "PIMPLE", false);
 
+    // TODO overview Info statements for parallel runs.
+
     // TODO make it general with input from a dictionary
     // create fa mesh using patch
     label patchID=mesh.boundaryMesh().findPatchID("reactive_surface");
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
     runTime.functionObjects().execute();     // Execute cntlDict functions
 
 // * * * * *   INITIATING THE FLOW   * * * * * * * * * * * * * * * * * * * * * //
-    Random rand(512462521+1007*Pstream::myProcNo());
+    Random rand(512462521 + 2021*Pstream::myProcNo());
 
     /*
     scalar rn = rand.GaussNormal<scalar>();

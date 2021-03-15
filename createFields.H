@@ -69,7 +69,25 @@ volVectorField RND
     mesh,
     dimensionedVector
     (
-        "RND", dimensionSet(0, 1, -1, 0, 0, 0, 0), vector(0,0,0)
+        "RND", dimensionSet(0, 1, -1, 0, 0, 0, 0), vector::zero
+    ),
+    boundaryTypes
+);
+
+volTensorField Zmom
+(
+    IOobject
+    (
+        "Zmom",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedTensor
+    (
+        "Zmom_dim", dimensionSet(0, 2, -2, 0, 0, 0, 0), tensor::zero
     ),
     boundaryTypes
 );

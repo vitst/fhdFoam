@@ -1,5 +1,3 @@
-Info << "Reading dissolFoam flags" << nl;
-
 Info << "Reading transportProperties" << nl;
 
 IOdictionary transportProperties

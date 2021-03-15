@@ -1,6 +1,6 @@
 
 {
-    scalar preFactor = 0.0001 * Foam::sqrt( 2.0 * D.value() );
+    scalar preFactor = 0.00001 * Foam::sqrt( 2.0 * D.value() );
 
     scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
     forAll(RND, i)
