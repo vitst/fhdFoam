@@ -2,17 +2,12 @@
 // Generate Gauss noise GWN tensor field
 forAll(Zmom, iz)
 {
-    tensor tmpZ = rand.GaussNormal<tensor>();
+    scalar fV = Foam::sqrt(mesh.V()[iz]);
+    tensor tmpZ = rand.GaussNormal<tensor>() / fV;
     Zmom[iz] = tmpZ + tmpZ.T();
 }
 
-//dimensionedScalar scl = dimensionedScalar("scl", dimensionSet(0, -2, 1, 0, 0, 0, 0), 1.0);
-
-dimensionedScalar momFactor = Foam::sqrt(nu * 1.0);
-
-//Info<<" momFactor: "<<momFactor<<nl;
-
-Zmom = momFactor.value() * Zmom;
+Zmom = sqrtDTinv * Zu0 * Zmom;
 
 // Solve the Momentum equation
 
@@ -22,7 +17,7 @@ tmp<fvVectorMatrix> tUEqn
     +
     fvm::div(phi, U)
     -
-    fvm::laplacian(nu, U)
+    fvm::laplacian(nu_h, U)
     -
     fvc::div(Zmom)
 );

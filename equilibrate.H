@@ -32,7 +32,7 @@
     {
         tmp<fvScalarMatrix> tCEqn
         (
-            fvm::div(phi, C) - fvm::laplacian(D, C)
+            fvm::div(phi, C) - fvm::laplacian(D_h, C)
         );
         fvScalarMatrix& CEqn = tCEqn.ref();
         CEqn.relax();

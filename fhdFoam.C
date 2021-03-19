@@ -50,6 +50,9 @@ Description
 //#include "dissolMotionPointPatchVectorField.H"
 //#include "pointPatchField.H"
 
+static const double Avogadro = 6.02214179e+23; // mol^-1
+static const double k_Boltzmann = 1.38064852e-23; // m^2 * kg * s^-2 * K^-1
+
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
@@ -116,7 +119,7 @@ int main(int argc, char *argv[])
                           << nl;
 
     scalar dt = runTime.deltaTValue();
-
+    scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
 
     while ( runTime.run() )
     {

@@ -4,7 +4,7 @@ tmp<fvVectorMatrix> tUEqn
 (
     fvm::div(phi, U)
     -
-    fvm::laplacian(nu, U)
+    fvm::laplacian(nu_h, U)
 );
 fvVectorMatrix& UEqn = tUEqn.ref();
 
