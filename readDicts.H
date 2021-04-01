@@ -33,10 +33,19 @@ dimensionedScalar rho
     transportProperties
 );
 
+/*
 dimensionedScalar U0
 (
     "U0",
     dimensionSet(0, 1, -1, 0, 0, 0, 0),
+    transportProperties
+);
+*/
+
+dimensionedScalar td
+(
+    "td",
+    dimensionSet(0, 0, 1, 0, 0, 0, 0),
     transportProperties
 );
 
@@ -99,7 +108,7 @@ Info << "***************************************************" << nl;
 Info << "kinematic viscosity, nu:     " << nu  <<  " cm^2/s"     << nl;
 Info << "temperature, T:              " << T   <<  " K"          << nl;
 Info << "density of solvent, rho:     " << rho <<  " g/cm^3"     << nl;
-Info << "unit velosity, U0:           " << U0  <<  " cm/s"       << nl;
+Info << "unit time, td:               " << td  <<  " s"          << nl;
 Info << "unit length,   h0:           " << h0  <<  " cm"         << nl;
 Info << nl;
 Info << "molecular diffusion, D:      " << D   <<  " cm^2/s"     << nl;
@@ -133,7 +142,8 @@ Info<<nl<<"Calculated dimensionless numbers"<<nl;
 
 // here the viscosity, for example is still dimensionedScalar
 // in order to overcome OF's dimension check.
-dimensionedScalar nu_h_dimless = nu / (U0*h0);
+dimensionedScalar nu_h_dimless = nu * td / (h0*h0);
+
 dimensionedScalar nu_h
 (
     "nu_h",
@@ -142,9 +152,9 @@ dimensionedScalar nu_h
 );
 
 //scalar Zu0 = Foam::sqrt( nu_h * k_B * T * 10e-7 / (U0*U0 * rho * h0*h0*h0 ) );
-dimensionedScalar Zu0 = Foam::sqrt( nu_h_dimless * k_B * T * 1e7 / (U0*U0 * rho * h0*h0*h0 ) );
+dimensionedScalar Zu0 = Foam::sqrt( nu_h_dimless * k_B * T * 1e7 * td*td / (rho * h0*h0*h0*h0*h0 ) );
 
-dimensionedScalar D_h_dimless = D / (U0*h0);
+dimensionedScalar D_h_dimless = D * td / (h0*h0);
 dimensionedScalar D_h
 (
     "D_h",
@@ -155,8 +165,11 @@ dimensionedScalar D_h
 //scalar Zc0 = Foam::sqrt( 2 * D_h * M / ( Avogadro * rho * h0*h0*h0 ) );
 dimensionedScalar Zc0 = Foam::sqrt( 2 * D_h_dimless * M / ( N_A * rho * h0*h0*h0 ) );
 
+//Zc0 *= (Foam::sqrt( M * 18 / (rho*rho) * 55.5 / (c_in - c_s) )).value();
+Zc0 *= ( Foam::sqrt( M * M / (rho*rho) ) ).value();
+
 //scalar ccc = c_s / (c_in - c_s);
-dimensionedScalar ccc = c_s / (c_in - c_s);
+dimensionedScalar ccc = c_s / c_in;
 
 dimensionedScalar theta
 (
@@ -165,12 +178,14 @@ dimensionedScalar theta
     transportProperties
 );
 
+/*
 dimensionedScalar Re
 (
     "Re",
     dimensionSet(0, 0, 0, 0, 0, 0, 0),
     (1.0 / nu_h).value()
 );
+*/
 
 dimensionedScalar Pe
 (
@@ -183,8 +198,9 @@ dimensionedScalar DaII
 (
     "DaII",
     dimensionSet(0, 0, 0, 0, 0, 0, 0),
-    ((k * h0) / D).value()
+    ((k * h0) / (D * c_in )).value()
 );
+//    ((k * h0) / (D * (c_in-c_s) )).value()
 
 dimensionedScalar DaI
 (
@@ -198,9 +214,9 @@ Info << "D_h:      " << D_h_dimless     << nl;
 Info << "Zu0:      " << Zu0     << nl;
 Info << "Zc0:      " << Zc0     << nl;
 
-Info << "t_d:      " << h0.value()/U0.value()<<nl;
+Info << "U0:      " << h0.value()/td.value()<<nl;
 
-Info << "Re:   " << Re <<nl;
+//Info << "Re:   " << Re <<nl;
 Info << "Pe:   " << Pe <<nl;
 Info << "DaI:  " << DaI <<nl;
 Info << "DaII: " << DaII<<nl;
