@@ -6,10 +6,13 @@
         RND[i] = rand.GaussNormal<vector>() / fV;
     }
 
+    Info<<"min max C: "<<min(C) << "  "<<max(C)<<nl;
+    Info<<"min max rho/Mcin - C: "<<min(rho/(M*c_in) - C) << "  "<<max(rho/(M*c_in) - C)<<nl;
+
     //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( (C + ccc) * (1-C) ) );
     //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( C + ccc ) );
     //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( C + ccc ) * ( (rho-c_s*M)/(M*(c_in-c_s)) - C) );
-    tmp<volScalarField> func_c = Foam::sqrt( C * ( rho/(M*c_in) - C) );
+    tmp<volScalarField> func_c = Foam::sqrt( Foam::mag(C) * ( rho/(M*c_in) - C) );
 
     //Info<<func_c<<nl<<nl;
     //Info<< (rho-c_s*M)/(M*(c_in-c_s)) <<nl;
