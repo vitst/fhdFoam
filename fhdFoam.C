@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 */
         // Info << " Update curvature"<<nl; 
         curv = fam.faceCurvatures();
-        Info<<"min(curv): "<<min(curv)<<"  max(curv): "<<max(curv)<<nl;
+        //Info<<"min(curv): "<<min(curv)<<"  max(curv): "<<max(curv)<<nl;
 
         //resCMt = mesh.checkTopology(true);
         resCMg = mesh.checkGeometry(false);
