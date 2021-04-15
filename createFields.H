@@ -92,7 +92,7 @@ volTensorField Zmom
     boundaryTypes
 );
 
-
+// surface curvature field
 areaScalarField curv
 (
     IOobject
@@ -109,6 +109,30 @@ areaScalarField curv
     )
 );
 curv = fam.faceCurvatures(); 
+
+// by default the growth is ON on all faces
+// if nucleation is enabled, then the growth is OFF or read from file
+scalar nucleationVal = 1.0;
+if(nucleation)
+{
+    nucleationVal = 0.0;
+}
+
+volScalarField growthOn
+(
+    IOobject
+    (
+        "growthOn",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("growthOn", dimensionSet(0, 0, 0, 0, 0, 0, 0), nucleationVal)
+);
+
+
 
 // create time field to test local euler
 volScalarField rDeltaT

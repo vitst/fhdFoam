@@ -245,5 +245,13 @@ dimensionedScalar l_R
 Info << "l_R:         " << l_R << nl;
 Info << "factor_drdt: " << factor_drdt << nl;
 
+// additional parameters for nucleation and scaling the noise
+bool nucleation = transportProperties.getOrDefault("nucleation", false);
 
+scalar scaleMomentumNoise = transportProperties.getOrDefault("scaleMomentumNoise", 1.0);
+scalar scaleMassNoise = transportProperties.getOrDefault("scaleMassNoise", 1.0);
+
+Info<<"nucleation: "<<nucleation<<nl;
+Info<<"scaleMomentumNoise: "<<scaleMomentumNoise<<nl;
+Info<<"scaleMassNoise: "<<scaleMassNoise<<nl;
 

@@ -7,7 +7,7 @@ forAll(Zmom, iz)
     Zmom[iz] = tmpZ + tmpZ.T();
 }
 
-Zmom = sqrtDTinv * Zu0 * Zmom;
+Zmom = (scaleMomentumNoise * sqrtDTinv * Zu0) * Zmom;
 
 // Solve the Momentum equation
 

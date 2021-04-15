@@ -90,10 +90,18 @@ int main(int argc, char *argv[])
     exit(0);
     */
 
-
     if(runTime.value()==0)
     { 
+        // turn nucleation off for equilibration
+        if(nucleation)
+        {
+            growthOn.boundaryFieldRef()[patchID] = 1.0;
+        }
         #include "equilibrate.H"
+        if(nucleation)
+        {
+            growthOn.boundaryFieldRef()[patchID] = 0.0;
+        }
     }
     C.correctBoundaryConditions();
     runTime.writeNow();
@@ -106,6 +114,22 @@ int main(int argc, char *argv[])
 /*##########################################
  *   Time-dependent convection-diffusion solver
  *##########################################*/
+   
+    if(nucleation)
+    {
+        // update nucleation after interpolation
+        forAll(growthOn.boundaryField()[patchID], i)
+        {
+            if(growthOn.boundaryField()[patchID][i]<0.5)
+                growthOn.boundaryFieldRef()[patchID][i] = 0.0;
+            else
+                growthOn.boundaryFieldRef()[patchID][i] = 1.0;
+        }
+    }
+    else
+    {
+        growthOn.boundaryFieldRef()[patchID] = 1.0;
+    }
 
     Info << "Time-dependent concentration solver"<< endl;
 
@@ -136,6 +160,26 @@ int main(int argc, char *argv[])
  *    Mesh motion & relaxation
  *    Control parameters in dynamicMeshDict
  *###############################################*/
+        // update nucleation
+
+        if(nucleation)
+        {
+            const scalarField& faceAreas = mesh.magSf().boundaryField()[patchID]; 
+            //Info<<"min(area): "<<min(faceAreas)<<"  max(faceAreas): "<<max(faceAreas)<<nl;
+
+            forAll(growthOn.boundaryField()[patchID], i)
+            {
+                scalar Cpatchi = C.boundaryField()[patchID][i];
+                // here update
+                scalar tmpZ = rand.sample01<scalar>();
+                if(tmpZ < 0.01*dt * Cpatchi)
+                {
+                    growthOn.boundaryFieldRef()[patchID][i] = 1;
+                }
+            }
+            Info<<"min(growthOn): "<<min(growthOn.boundaryField()[patchID])<<"  max(growthOn): "<<max(growthOn.boundaryField()[patchID])<<nl;
+        }
+
         mesh.update();
         //mesh.controlledUpdate();
 /*

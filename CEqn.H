@@ -19,7 +19,7 @@
 
     //exit(0);
 
-    RND = (sqrtDTinv * Zc0 * func_c) * RND;
+    RND = (scaleMassNoise * sqrtDTinv * Zc0 * func_c) * RND;
 
     RND.correctBoundaryConditions();
 
