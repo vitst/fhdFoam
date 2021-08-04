@@ -171,6 +171,7 @@ Zc0 *= ( Foam::sqrt( M * M / (rho*rho) ) ).value();
 //scalar ccc = c_s / (c_in - c_s);
 dimensionedScalar ccc = c_s / c_in;
 
+// theta is 1/ccc, which is c_in/c_s
 dimensionedScalar theta
 (
     "theta",
@@ -255,3 +256,15 @@ Info<<"nucleation: "<<nucleation<<nl;
 Info<<"scaleMomentumNoise: "<<scaleMomentumNoise<<nl;
 Info<<"scaleMassNoise: "<<scaleMassNoise<<nl;
 
+// TODO some parameters for nucleation will be hardcoded for now
+scalar gamma = 35. * Foam::pow(10., -7);
+
+scalar kBT = (k_B * T).value();
+
+scalar nua = (nu_m / N_A).value();
+
+scalar Bcoef = 16./3. * Foam::constant::mathematical::pi * Foam::pow(nua, 2) * Foam::pow(gamma/kBT, 3);
+
+scalar lnA = 20.0;
+
+Info<<"Bcoef: "<<Bcoef<<nl;

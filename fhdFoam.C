@@ -37,6 +37,7 @@ Description
 #include "faCFD.H"
 
 // OF
+#include "mathematicalConstants.H"
 //#include "pointPatchField.H"
 //#include "syncTools.H"
 #include "dynamicFvMesh.H"
@@ -103,6 +104,9 @@ int main(int argc, char *argv[])
             growthOn.boundaryFieldRef()[patchID] = 0.0;
         }
     }
+    {
+        #include "equilAfterRestart.H"
+    }
     C.correctBoundaryConditions();
     runTime.writeNow();
 
@@ -165,19 +169,45 @@ int main(int argc, char *argv[])
         if(nucleation)
         {
             const scalarField& faceAreas = mesh.magSf().boundaryField()[patchID]; 
+            const scalarField& faceCs = C.boundaryField()[patchID];
+            const pointField& faceCentres = mesh.Cf().boundaryField()[patchID];
             //Info<<"min(area): "<<min(faceAreas)<<"  max(faceAreas): "<<max(faceAreas)<<nl;
 
+            point sphCenter(50, 0, 0.05);
             forAll(growthOn.boundaryField()[patchID], i)
             {
-                scalar Cpatchi = C.boundaryField()[patchID][i];
-                // here update
-                scalar tmpZ = rand.sample01<scalar>();
-                if(tmpZ < 0.01*dt * Cpatchi)
+                // apply only if the face hasn't been activated
+                if(growthOn.boundaryField()[patchID][i] < 0.95)
                 {
-                    growthOn.boundaryFieldRef()[patchID][i] = 1;
+                    // calculate distance to center at (50 0 0.05)
+                    scalar dist = Foam::mag( faceCentres[i] - sphCenter );
+                    scalar surfL = faceAreas[i] / 0.1;
+                    // here 1.0 is radius of the initial sphere
+                    if(dist > surfL+1.0)
+                    {
+                        growthOn.boundaryFieldRef()[patchID][i] = 1;
+                    }
+                    else
+                    {
+                        scalar SI = Foam::log( (theta * theta * faceCs[i] * faceCs[i]).value() );
+                        scalar sf = faceAreas[i];
+    
+                        scalar lnJ = lnA - Bcoef / (SI*SI);
+                        scalar J = Foam::exp(lnJ);
+    
+                        scalar prob = 1 - Foam::exp( - (sf * J * dt * h0 * h0 * td).value() ); 
+    
+                        // here update
+                        scalar tmpZ = rand.sample01<scalar>();
+    
+                        if(tmpZ < prob)
+                        {
+                            growthOn.boundaryFieldRef()[patchID][i] = 1;
+                        }
+                    }
                 }
             }
-            Info<<"min(growthOn): "<<min(growthOn.boundaryField()[patchID])<<"  max(growthOn): "<<max(growthOn.boundaryField()[patchID])<<nl;
+            //Info<<"min(growthOn): "<<min(growthOn.boundaryField()[patchID])<<"  max(growthOn): "<<max(growthOn.boundaryField()[patchID])<<nl;
         }
 
         mesh.update();
@@ -197,6 +227,10 @@ int main(int argc, char *argv[])
         Info<<"Check mesh (geometry):  "<<resCMg<<nl;
 
         // --- Pressure-velocity PIMPLE corrector loop
+
+        // Generate Gauss noise GWN tensor field for NS eq
+        #include "ZmomGen.H"
+
         while (pimple.loop())                                                
         {                                                                    
 /*
@@ -222,7 +256,6 @@ int main(int argc, char *argv[])
 */
 
             #include "UEqn.H"
-            #include "CEqn.H"
 
             // --- Pressure corrector loop
             while (pimple.correct())
@@ -230,7 +263,9 @@ int main(int argc, char *argv[])
                 // assuming pimple consistent is true
                 #include "pEqn.H"
             }
-        }                                                                    
+        }
+
+        #include "CEqn.H"
 
 // *********************************************************
 // *    Write Output data
