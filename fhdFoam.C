@@ -83,6 +83,9 @@ int main(int argc, char *argv[])
 // * * * * *   INITIATING THE FLOW   * * * * * * * * * * * * * * * * * * * * * //
     Random rand(512462521 + 2021*Pstream::myProcNo());
 
+    scalar dt = runTime.deltaTValue();
+    scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
+
     /*
     scalar rn = rand.GaussNormal<scalar>();
     Pout<<"random: "<< rn <<"    "<<Pstream::myProcNo()<<nl;
@@ -146,8 +149,6 @@ int main(int argc, char *argv[])
                           << Foam::pow( max(mesh.V()), 1./3.)
                           << nl;
 
-    scalar dt = runTime.deltaTValue();
-    scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
 
     while ( runTime.run() )
     {
