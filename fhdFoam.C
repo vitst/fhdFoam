@@ -32,24 +32,15 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-// common and simpleFoam
+// common
 #include "fvCFD.H"
 #include "faCFD.H"
 
 // OF
 #include "mathematicalConstants.H"
-//#include "pointPatchField.H"
-//#include "syncTools.H"
 #include "dynamicFvMesh.H"
-#include "pimpleControl.H"
-#include "CorrectPhi.H"
-
+#include "pisoControl.H"
 #include "steadyStateControl.H"
-
-// dissolFoam project
-//#include "steadyStateControl.H"
-//#include "dissolMotionPointPatchVectorField.H"
-//#include "pointPatchField.H"
 
 static const double Avogadro = 6.02214179e+23; // mol^-1
 static const double k_Boltzmann = 1.38064852e-23; // m^2 * kg * s^-2 * K^-1
@@ -59,8 +50,7 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
-    //#include "initContinuityErrs.H"
-    //#include "createPimpleControl.H"
+    #include "createControl.H"
     pimpleControl pimple(mesh, "PIMPLE", false);
 
     // TODO overview Info statements for parallel runs.
@@ -73,8 +63,9 @@ int main(int argc, char *argv[])
     // local includes
     #include "readDicts.H"
     #include "createFields.H"
-    #include "createUfIfPresent.H"
-    #include "CourantNo.H"
+
+    #include "initContinuityErrs.H"
+    
 
 // * * * * *   MAIN LOOP   * * * * * * * * * * * * * * * * * * * * * //
 
@@ -153,7 +144,8 @@ int main(int argc, char *argv[])
     while ( runTime.run() )
     {
         //#include "readDyMControls.H"
-        //#include "CourantNo.H"
+
+        #include "CourantNo.H"
 
         ++runTime;
         Info << "Begin cycle: Time = " << runTime.timeName() 
@@ -212,56 +204,18 @@ int main(int argc, char *argv[])
         }
 
         mesh.update();
-        //mesh.controlledUpdate();
-/*
-        Info << "Mesh update: ExecutionTime = " 
-             << runTime.elapsedCpuTime() << " s"
-             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-             << nl<< endl;
-*/
-        // Info << " Update curvature"<<nl; 
         curv = fam.faceCurvatures();
-        //Info<<"min(curv): "<<min(curv)<<"  max(curv): "<<max(curv)<<nl;
 
-        //resCMt = mesh.checkTopology(true);
         resCMg = mesh.checkGeometry(false);
         Info<<"Check mesh (geometry):  "<<resCMg<<nl;
 
-        // --- Pressure-velocity PIMPLE corrector loop
-
-        // Generate Gauss noise GWN tensor field for NS eq
-        #include "ZmomGen.H"
-
-        while (pimple.loop())                                                
+        // Pressure-velocity PISO corrector
         {                                                                    
-/*
-            if (mesh.changing())
-            {
-                //if (correctPhi)
-                {
-                    // Calculate absolute flux
-                    // from the mapped surface velocity
-                    phi = mesh.Sf() & Uf();
-
-                    #include "correctPhi.H"
-
-                    // Make the flux relative to the mesh motion
-                    fvc::makeRelative(phi, U);
-                }
-
-                //if (checkMeshCourantNo)
-                {
-                //    #include "meshCourantNo.H"
-                }
-            }
-*/
-
             #include "UEqn.H"
 
             // --- Pressure corrector loop
-            while (pimple.correct())
+            while (piso.correct())
             {
-                // assuming pimple consistent is true
                 #include "pEqn.H"
             }
         }
@@ -273,9 +227,8 @@ int main(int argc, char *argv[])
 // *********************************************************
 
         runTime.write();
-        //mesh.update();
-        //mesh.controlledUpdate();
-        //runTime.printExecutionTime(Info);
+
+        mesh.update();
     }
 
     Info << "End" << endl;
