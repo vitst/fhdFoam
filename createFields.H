@@ -56,42 +56,6 @@ Info << "Creating random component field and surface curvature" << endl;
 int numPatches = mesh.boundaryMesh().size();
 wordList boundaryTypes(numPatches, "calculated"); // default bc
 
-volVectorField RND
-(
-    IOobject
-    (
-        "RND",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector
-    (
-        "RND", dimensionSet(0, 1, -1, 0, 0, 0, 0), vector::zero
-    ),
-    boundaryTypes
-);
-
-volTensorField Zmom
-(
-    IOobject
-    (
-        "Zmom",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedTensor
-    (
-        "Zmom_dim", dimensionSet(0, 2, -2, 0, 0, 0, 0), tensor::zero
-    ),
-    boundaryTypes
-);
-
 // surface curvature field
 areaScalarField curv
 (
@@ -131,7 +95,6 @@ volScalarField growthOn
     mesh,
     dimensionedScalar("growthOn", dimensionSet(0, 0, 0, 0, 0, 0, 0), nucleationVal)
 );
-
 
 
 // create time field to test local euler

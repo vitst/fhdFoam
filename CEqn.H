@@ -1,28 +1,5 @@
 
 {
-    forAll(RND, i)
-    {
-        scalar fV = Foam::sqrt(mesh.V()[i]);
-        RND[i] = rand.GaussNormal<vector>() / fV;
-    }
-
-    //Info<<"min max C: "<<min(C) << "  "<<max(C)<<nl;
-    //Info<<"min max rho/Mcin - C: "<<min(rho/(M*c_in) - C) << "  "<<max(rho/(M*c_in) - C)<<nl;
-
-    //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( (C + ccc) * (1-C) ) );
-    //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( C + ccc ) );
-    //tmp<volScalarField> func_c = Foam::sqrt( Foam::mag( C + ccc ) * ( (rho-c_s*M)/(M*(c_in-c_s)) - C) );
-    tmp<volScalarField> func_c = Foam::sqrt( Foam::mag(C) * ( rho/(M*c_in) - C) );
-
-    //Info<<func_c<<nl<<nl;
-    //Info<< (rho-c_s*M)/(M*(c_in-c_s)) <<nl;
-
-    //exit(0);
-
-    RND = (scaleMassNoise * sqrtDTinv * Zc0 * func_c) * RND;
-
-    RND.correctBoundaryConditions();
-
     tmp<fvScalarMatrix> tCEqn
     (
         fvm::ddt(C) 
@@ -30,8 +7,6 @@
         fvm::div(phi, C)
         - 
         fvm::laplacian(D_h, C)
-        +
-        fvc::div(RND)
     );
 
     fvScalarMatrix& CEqn = tCEqn.ref();

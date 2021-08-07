@@ -75,15 +75,6 @@ int main(int argc, char *argv[])
     Random rand(512462521 + 2021*Pstream::myProcNo());
 
     scalar dt = runTime.deltaTValue();
-    scalar sqrtDTinv = 1.0 / Foam::sqrt(dt);
-
-    /*
-    scalar rn = rand.GaussNormal<scalar>();
-    Pout<<"random: "<< rn <<"    "<<Pstream::myProcNo()<<nl;
-    scalar rng = rand.globalGaussNormal<scalar>();
-    Pout<<" global random: "<< rng <<nl;
-    exit(0);
-    */
 
     if(runTime.value()==0)
     { 
