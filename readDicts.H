@@ -33,15 +33,6 @@ dimensionedScalar rho
     transportProperties
 );
 
-/*
-dimensionedScalar U0
-(
-    "U0",
-    dimensionSet(0, 1, -1, 0, 0, 0, 0),
-    transportProperties
-);
-*/
-
 dimensionedScalar td
 (
     "td",
@@ -151,9 +142,6 @@ dimensionedScalar nu_h
     nu_h_dimless.value()
 );
 
-//scalar Zu0 = Foam::sqrt( nu_h * k_B * T * 10e-7 / (U0*U0 * rho * h0*h0*h0 ) );
-dimensionedScalar Zu0 = Foam::sqrt( nu_h_dimless * k_B * T * 1e7 * td*td / (rho * h0*h0*h0*h0*h0 ) );
-
 dimensionedScalar D_h_dimless = D * td / (h0*h0);
 dimensionedScalar D_h
 (
@@ -162,13 +150,6 @@ dimensionedScalar D_h
     D_h_dimless.value()
 );
 
-//scalar Zc0 = Foam::sqrt( 2 * D_h * M / ( Avogadro * rho * h0*h0*h0 ) );
-dimensionedScalar Zc0 = Foam::sqrt( 2 * D_h_dimless * M / ( N_A * rho * h0*h0*h0 ) );
-
-//Zc0 *= (Foam::sqrt( M * 18 / (rho*rho) * 55.5 / (c_in - c_s) )).value();
-Zc0 *= ( Foam::sqrt( M * M / (rho*rho) ) ).value();
-
-//scalar ccc = c_s / (c_in - c_s);
 dimensionedScalar ccc = c_s / c_in;
 
 // theta is 1/ccc, which is c_in/c_s
@@ -178,15 +159,6 @@ dimensionedScalar theta
     dimensionSet(0, 0, 0, 0, 0, 0, 0),
     transportProperties
 );
-
-/*
-dimensionedScalar Re
-(
-    "Re",
-    dimensionSet(0, 0, 0, 0, 0, 0, 0),
-    (1.0 / nu_h).value()
-);
-*/
 
 dimensionedScalar Pe
 (
@@ -201,7 +173,6 @@ dimensionedScalar DaII
     dimensionSet(0, 0, 0, 0, 0, 0, 0),
     ((k * h0) / (D * c_in )).value()
 );
-//    ((k * h0) / (D * (c_in-c_s) )).value()
 
 dimensionedScalar DaI
 (
@@ -212,12 +183,9 @@ dimensionedScalar DaI
 
 Info << "nu_h:     " << nu_h_dimless    << nl;
 Info << "D_h:      " << D_h_dimless     << nl;
-Info << "Zu0:      " << Zu0     << nl;
-Info << "Zc0:      " << Zc0     << nl;
 
 Info << "U0:      " << h0.value()/td.value()<<nl;
 
-//Info << "Re:   " << Re <<nl;
 Info << "Pe:   " << Pe <<nl;
 Info << "DaI:  " << DaI <<nl;
 Info << "DaII: " << DaII<<nl;
@@ -249,22 +217,15 @@ Info << "factor_drdt: " << factor_drdt << nl;
 // additional parameters for nucleation and scaling the noise
 bool nucleation = transportProperties.getOrDefault("nucleation", false);
 
-scalar scaleMomentumNoise = transportProperties.getOrDefault("scaleMomentumNoise", 1.0);
-scalar scaleMassNoise = transportProperties.getOrDefault("scaleMassNoise", 1.0);
-
 Info<<"nucleation: "<<nucleation<<nl;
-Info<<"scaleMomentumNoise: "<<scaleMomentumNoise<<nl;
-Info<<"scaleMassNoise: "<<scaleMassNoise<<nl;
 
 // TODO some parameters for nucleation will be hardcoded for now
 scalar gamma = 35. * Foam::pow(10., -7);
 
 scalar kBT = (k_B * T).value();
-
 scalar nua = (nu_m / N_A).value();
-
 scalar Bcoef = 16./3. * Foam::constant::mathematical::pi * Foam::pow(nua, 2) * Foam::pow(gamma/kBT, 3);
 
 scalar lnA = 20.0;
 
-Info<<"Bcoef: "<<Bcoef<<nl;
+Info<<"Bcoef: "<<Bcoef<<nl<<nl;

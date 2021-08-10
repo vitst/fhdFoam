@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
     #include "createControl.H"
-    pimpleControl pimple(mesh, "PIMPLE", false);
 
     // TODO overview Info statements for parallel runs.
 
@@ -65,7 +64,6 @@ int main(int argc, char *argv[])
     #include "createFields.H"
 
     #include "initContinuityErrs.H"
-    
 
 // * * * * *   MAIN LOOP   * * * * * * * * * * * * * * * * * * * * * //
 
@@ -95,7 +93,6 @@ int main(int argc, char *argv[])
     C.correctBoundaryConditions();
     runTime.writeNow();
 
-    //bool resCM = mesh.checkMesh(true);
     int resCMt = mesh.checkTopology(true);
     int resCMg = mesh.checkGeometry(true);
     Info<<"result of check mesh I run:  "<<resCMt<<"  "<<resCMg<<nl;
@@ -124,18 +121,16 @@ int main(int argc, char *argv[])
 
     scalar totVol = 0;
     for(scalar cellVol: mesh.V()) totVol+=cellVol;
-    Info<<"total volume: "<<totVol<<nl;
+    Info<< nl <<"total volume: "<<totVol<<nl;
 
     Info<<"min max Mesh: "<< Foam::pow( min(mesh.V()), 1./3.)
                           << "  "
                           << Foam::pow( max(mesh.V()), 1./3.)
-                          << nl;
+                          << nl << nl;
 
 
     while ( runTime.run() )
     {
-        //#include "readDyMControls.H"
-
         #include "CourantNo.H"
 
         ++runTime;

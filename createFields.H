@@ -34,7 +34,7 @@ volVectorField U
 
 label pRefCell = 0;
 scalar pRefValue = 0.0;
-setRefCell(p, pimple.dict(), pRefCell, pRefValue);
+setRefCell(p, piso.dict(), pRefCell, pRefValue);
 mesh.setFluxRequired(p.name());
 
 Info << "Reading field C" << endl;
