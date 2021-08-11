@@ -190,6 +190,7 @@ int main(int argc, char *argv[])
         }
 
         mesh.update();
+
         curv = fam.faceCurvatures();
 
         resCMg = mesh.checkGeometry(false);
@@ -213,8 +214,6 @@ int main(int argc, char *argv[])
 // *********************************************************
 
         runTime.write();
-
-        mesh.update();
     }
 
     Info << "End" << endl;
