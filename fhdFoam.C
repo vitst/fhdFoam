@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
                 {
                     // calculate distance to center at (50 0 0.05)
                     scalar dist = Foam::mag( faceCentres[i] - sphCenter );
-                    scalar surfL = faceAreas[i] / 0.1;
+                    scalar surfL = faceAreas[i] / 0.8;
                     // here 1.0 is radius of the initial sphere
                     if(dist > surfL+1.0)
                     {
