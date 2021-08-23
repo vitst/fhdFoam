@@ -148,6 +148,12 @@ int main(int argc, char *argv[])
     {
         #include "CourantNo.H"
 
+        if(CoNum>10.0)
+        {
+            Info<<"*** Error. Courant Number is too high"<<CoNum<<" adjust the mesh."<<nl;
+            exit(1);
+        }
+
         ++runTime;
         Info << "Begin cycle: Time = " << runTime.timeName() 
              << "    dt = " << dt
