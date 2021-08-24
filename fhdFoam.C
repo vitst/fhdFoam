@@ -150,8 +150,9 @@ int main(int argc, char *argv[])
 
         if(CoNum>10.0)
         {
-            Info<<"*** Error. Courant Number is too high"<<CoNum<<" adjust the mesh."<<nl;
-            exit(1);
+            SeriousErrorIn("main")
+                <<"*** Error. Co Num is too high  "<<CoNum<<"  adjust the mesh."<<nl
+                << exit(FatalError);
         }
 
         ++runTime;
