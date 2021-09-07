@@ -76,14 +76,10 @@ int main(int argc, char *argv[])
     time_t timer;
     struct tm y2k = {0};
     double seconds;
-  
     y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
     y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
-  
     time(&timer);  /* get current time; same as: timer = time(NULL)  */
-  
     seconds = difftime(timer,mktime(&y2k));
-
     Random rand(int(seconds) + 2021*Pstream::myProcNo());
     //Random rand(512462521 + 2021*Pstream::myProcNo());
 
