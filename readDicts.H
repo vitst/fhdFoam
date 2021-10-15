@@ -219,6 +219,7 @@ bool nucleation = transportProperties.getOrDefault("nucleation", false);
 
 Info<<"nucleation: "<<nucleation<<nl;
 
+
 // TODO some parameters for nucleation will be hardcoded for now
 scalar gamma = 35. * Foam::pow(10., -7);
 
@@ -226,6 +227,8 @@ scalar kBT = (k_B * T).value();
 scalar nua = (nu_m / N_A).value();
 scalar Bcoef = 16./3. * Foam::constant::mathematical::pi * Foam::pow(nua, 2) * Foam::pow(gamma/kBT, 3);
 
-scalar lnA = 20.0;
+//scalar lnA = 15.0;
+scalar lnA = transportProperties.getOrDefault("lnA", 0.0);
 
-Info<<"Bcoef: "<<Bcoef<<nl<<nl;
+Info<<"lnA: "<< lnA <<"   Bcoef: "<<Bcoef<<nl<<nl;
+

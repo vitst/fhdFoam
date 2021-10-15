@@ -96,6 +96,21 @@ volScalarField growthOn
     dimensionedScalar("growthOn", dimensionSet(0, 0, 0, 0, 0, 0, 0), nucleationVal)
 );
 
+volScalarField chi
+(
+    IOobject
+    (
+        "coverage",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar(
+        "cov", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0
+    )
+);
 
 // create time field to test local euler
 volScalarField rDeltaT

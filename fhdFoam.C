@@ -47,6 +47,7 @@ Description
 
 static const double Avogadro = 6.02214179e+23; // mol^-1
 static const double k_Boltzmann = 1.38064852e-23; // m^2 * kg * s^-2 * K^-1
+static const scalar PI = constant::mathematical::pi;
 
 int main(int argc, char *argv[])
 {
@@ -169,10 +170,18 @@ int main(int argc, char *argv[])
             const scalarField& faceCs = C.boundaryField()[patchID];
             const pointField& faceCentres = mesh.Cf().boundaryField()[patchID];
             //Info<<"min(area): "<<min(faceAreas)<<"  max(faceAreas): "<<max(faceAreas)<<nl;
+            
+            //scalarField gradField = -C.boundaryField()[patchID].snGrad();
+            //scalarField dr = dt * factor_drdt.value() * gradField;
+            scalar dr_f = (nu_m * k * td / h0).value()  *  dt;
+            scalarField R_hat = (theta*theta * C*C - 1);
+            scalarField dr = dr_f * R_hat;
+            //Info<<"min(dr): "<<min(dr)<<"  max(dr): "<<max(dr)<<nl;
 
             point sphCenter(50, 0, 0.05);
             forAll(growthOn.boundaryField()[patchID], i)
             {
+                scalar sf = faceAreas[i];
                 // apply only if the face hasn't been activated
                 if(growthOn.boundaryField()[patchID][i] < 0.95)
                 {
@@ -187,7 +196,6 @@ int main(int argc, char *argv[])
                     else
                     {
                         scalar SI = Foam::log( (theta * theta * faceCs[i] * faceCs[i]).value() );
-                        scalar sf = faceAreas[i];
     
                         scalar lnJ = lnA - Bcoef / (SI*SI);
                         scalar J = Foam::exp(lnJ);
@@ -200,10 +208,23 @@ int main(int argc, char *argv[])
                         if(tmpZ < prob)
                         {
                             growthOn.boundaryFieldRef()[patchID][i] = 1;
+                            // assume nucl is 5 nm^2 area, in h0:
+                            chi.boundaryFieldRef()[patchID][i] += 5*0.00000001/sf;
                         }
                     }
                 }
+                else if(chi[i]<1.0-SMALL)
+                {
+                    scalar delta_chi = 
+                        (PI*dr[i] + Foam::sqrt(PI*sf*chi.boundaryFieldRef()[patchID][i])) * dr[i] / sf;
+
+                    chi.boundaryFieldRef()[patchID][i] += delta_chi;
+                    //Info<<i<<"  delta_chi: "<<delta_chi
+                    //    <<"      "<<growthOn.boundaryField()[patchID][i]<<nl;
+                }
             }
+            chi.min(1.0);
+            //Info<<"min(chi): "<<min(chi)<<"  max(chi): "<<max(chi)<<nl;
             //Info<<"min(growthOn): "<<min(growthOn.boundaryField()[patchID])<<"  max(growthOn): "<<max(growthOn.boundaryField()[patchID])<<nl;
         }
 
