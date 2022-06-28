@@ -185,22 +185,30 @@ int main(int argc, char *argv[])
                 // apply only if the face hasn't been activated
                 if(growthOn.boundaryField()[patchID][i] < 0.95)
                 {
+                    //!!!
                     // calculate distance to center at (50 0 0.05)
-                    scalar dist = Foam::mag( faceCentres[i] - sphCenter );
-                    scalar surfL = faceAreas[i] / 0.8;
+                    //scalar dist = Foam::mag( faceCentres[i] - sphCenter );
+                    //scalar surfL = faceAreas[i] / 0.8;
                     // here 1.0 is radius of the initial sphere
-                    if(dist > surfL+1.0)
-                    {
-                        growthOn.boundaryFieldRef()[patchID][i] = 1;
-                    }
-                    else
+                    //if(dist > surfL+1.0)
+                    //{
+                    //    growthOn.boundaryFieldRef()[patchID][i] = 1;
+                    //}
+                    //else
                     {
                         scalar SI = Foam::log( (theta * theta * faceCs[i] * faceCs[i]).value() );
+
+                        scalar gamma_ef_i = gamma_ef.boundaryFieldRef()[patchID][i];
+
+                        //!!!
+                        scalar Bcoef = 16./3. * Foam::constant::mathematical::pi * Foam::pow(nua, 2) * Foam::pow(gamma_ef_i/kBT, 3);
     
                         scalar lnJ = lnA - Bcoef / (SI*SI);
                         scalar J = Foam::exp(lnJ);
     
                         scalar prob = 1 - Foam::exp( - (sf * J * dt * h0 * h0 * td).value() ); 
+
+                        probNuc.boundaryFieldRef()[patchID][i] = prob;
     
                         // here update
                         scalar tmpZ = rand.sample01<scalar>();
@@ -221,6 +229,7 @@ int main(int argc, char *argv[])
                     chi.boundaryFieldRef()[patchID][i] += delta_chi;
                     //Info<<i<<"  delta_chi: "<<delta_chi
                     //    <<"      "<<growthOn.boundaryField()[patchID][i]<<nl;
+                    probNuc.boundaryFieldRef()[patchID][i] = -1;
                 }
             }
             chi.min(1.0);
@@ -228,7 +237,8 @@ int main(int argc, char *argv[])
             //Info<<"min(growthOn): "<<min(growthOn.boundaryField()[patchID])<<"  max(growthOn): "<<max(growthOn.boundaryField()[patchID])<<nl;
         }
 
-        mesh.update();
+        //!!!
+        //mesh.update();
 
         curv = fam.faceCurvatures();
 

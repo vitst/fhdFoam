@@ -112,6 +112,66 @@ volScalarField chi
     )
 );
 
+
+
+volScalarField probNuc
+(
+    IOobject
+    (
+        "probNuc",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar(
+        "probNuc", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0
+    )
+);
+
+
+volScalarField gamma_ef
+(
+    IOobject
+    (
+        "gamma_ef",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar(
+        "gamma_ef_dim", dimensionSet(0, 0, 0, 0, 0, 0, 0), gamma
+    )
+);
+
+const pointField& fCs = mesh.Cf().boundaryField()[patchID];
+forAll(fCs, i)
+{
+    if(fCs[i][0]>28 && fCs[i][0]<32 && fCs[i][1]>26 && fCs[i][1]<30)
+    {
+        gamma_ef.boundaryFieldRef()[patchID][i] = 0.01*gamma;
+    }
+    if(fCs[i][0]>28 && fCs[i][0]<32 && fCs[i][1]>-30 && fCs[i][1]<-26)
+    {
+        gamma_ef.boundaryFieldRef()[patchID][i] = 0.01*gamma;
+    }
+    if(fCs[i][0]>60 && fCs[i][0]<64 && fCs[i][1]>26 && fCs[i][1]<30)
+    {
+        gamma_ef.boundaryFieldRef()[patchID][i] = 0.01*gamma;
+    }
+    if(fCs[i][0]>60 && fCs[i][0]<64 && fCs[i][1]>-30 && fCs[i][1]<-26)
+    {
+        gamma_ef.boundaryFieldRef()[patchID][i] = 0.01*gamma;
+    }
+
+}
+
+
+
+
 // create time field to test local euler
 volScalarField rDeltaT
 (
