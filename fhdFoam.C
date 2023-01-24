@@ -66,8 +66,9 @@ int main(int argc, char *argv[])
 
     // TODO make it general with input from a dictionary
     // create fa mesh using patch
-    label patchID=mesh.boundaryMesh().findPatchID("reactive_surface");
-    faMesh fam(mesh, patchID);
+    //!!label patchID=mesh.boundaryMesh().findPatchID("reactive_surface");
+    //faMesh fam(mesh, patchID);
+    //!!faMesh fam(mesh);
   
     // local includes
     #include "readDicts.H"
@@ -91,6 +92,7 @@ int main(int argc, char *argv[])
     */
 
 
+    /*!
     if(runTime.value()==0)
     { 
         #include "equilibrate.H"
@@ -102,6 +104,7 @@ int main(int argc, char *argv[])
     int resCMt = mesh.checkTopology(true);
     int resCMg = mesh.checkGeometry(true);
     Info<<"result of check mesh I run:  "<<resCMt<<"  "<<resCMg<<nl;
+    !*/
 
 /*##########################################
  *   Time-dependent convection-diffusion solver
@@ -127,7 +130,7 @@ int main(int argc, char *argv[])
         //#include "CourantNo.H"
 
         ++runTime;
-        Info << "Begin cycle: Time = " << runTime.timeName() 
+        Info << nl << "Begin cycle: Time = " << runTime.timeName() 
              << "    dt = " << dt
              << nl << endl;
 
@@ -145,12 +148,12 @@ int main(int argc, char *argv[])
              << nl<< endl;
 */
         // Info << " Update curvature"<<nl; 
-        curv = fam.faceCurvatures();
+        //!!curv = fam.faceCurvatures();
         //Info<<"min(curv): "<<min(curv)<<"  max(curv): "<<max(curv)<<nl;
 
         //resCMt = mesh.checkTopology(true);
-        resCMg = mesh.checkGeometry(false);
-        Info<<"Check mesh (geometry):  "<<resCMg<<nl;
+        //!resCMg = mesh.checkGeometry(false);
+        //!Info<<"Check mesh (geometry):  "<<resCMg<<nl;
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())                                                
@@ -191,6 +194,8 @@ int main(int argc, char *argv[])
 // *********************************************************
 // *    Write Output data
 // *********************************************************
+        scalar totC = gSum(C);
+        Info<<"total C: "<< totC<<endl;
 
         runTime.write();
         //mesh.update();

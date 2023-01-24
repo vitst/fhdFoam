@@ -92,7 +92,7 @@ volTensorField Zmom
     boundaryTypes
 );
 
-
+/*
 areaScalarField curv
 (
     IOobject
@@ -109,6 +109,7 @@ areaScalarField curv
     )
 );
 curv = fam.faceCurvatures(); 
+*/
 
 // create time field to test local euler
 volScalarField rDeltaT
