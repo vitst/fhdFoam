@@ -160,8 +160,9 @@ int main(int argc, char *argv[])
  *    Mesh motion & relaxation
  *    Control parameters in dynamicMeshDict
  *###############################################*/
-        // update nucleation
 
+        // update nucleation
+        // TODO switch to the nucleation control
         if(nucleation)
         {
             const scalarField& faceAreas = mesh.magSf().boundaryField()[patchID]; 
